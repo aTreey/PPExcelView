@@ -1,0 +1,6 @@
+framework module PPExcelView {
+  umbrella header "PPExcelView-umbrella.h"
+
+  export *
+  module * { export * }
+}
