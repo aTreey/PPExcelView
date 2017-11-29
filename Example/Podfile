@@ -1,0 +1,14 @@
+use_frameworks!
+
+target 'PPExcelView_Example' do
+  pod 'PPExcelView', :path => '../'
+
+  target 'PPExcelView_Tests' do
+    inherit! :search_paths
+
+    pod 'Specta'
+  pod 'Expecta'
+  pod 'FBSnapshotTestCase'
+  pod 'Expecta+Snapshots'
+  end
+end
