@@ -11,6 +11,7 @@
 #endif
 
 #import "EFBaseExcelView.h"
+#import "PPTableContentCell.h"
 
 FOUNDATION_EXPORT double PPExcelViewVersionNumber;
 FOUNDATION_EXPORT const unsigned char PPExcelViewVersionString[];

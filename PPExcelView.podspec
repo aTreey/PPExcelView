@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 类似表格的控件，自适应列宽
                        DESC
 
-  s.homepage         = 'https://github.com/aTreey/PPExcelView'
+  s.homepage         = 'https://github.com/aTreey/PPExcelView.git'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'aTreey' => '480814177@qq.com' }

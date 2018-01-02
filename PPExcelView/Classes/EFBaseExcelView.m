@@ -8,17 +8,30 @@
 
 #import "EFBaseExcelView.h"
 
+#import "PPTableContentCell.h"
+
 
 static const CGFloat titleLable_Height = 49;
+
+static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifier";
 
 
 @interface EFBaseExcelView ()
 
+@property (nonatomic, strong) UITableView *titleTableView;//标题TableView
+@property (nonatomic, strong) UITableView *contentTableView;//内容TableView
+@property (nonatomic, strong) UIScrollView *contentView;//内容容器
+@property (nonatomic, assign) CGSize contentSize;
 @property (nonatomic, strong) NSMutableArray *labelArray;
 @property (nonatomic, strong) NSMutableArray *labelWidthArray;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, assign) CGFloat right_titleLable_Width;
-@property (nonatomic, assign) CGFloat maxWidth;
+
+// 右边tableView 宽度
+@property (nonatomic, assign) CGFloat rightViewWidth;
+
+// 列的最大宽度
+@property (nonatomic, assign) CGFloat cloumnMaxWidth;
 
 
 @end
@@ -28,7 +41,7 @@ static const CGFloat titleLable_Height = 49;
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _right_titleLable_Width = kScreenWidth * 0.5;
+        _cloumnMaxWidth = frame.size.width * 0.5;
         [self setupViews];
     }
     return self;
@@ -42,7 +55,7 @@ static const CGFloat titleLable_Height = 49;
     }
     
     if (self) {
-        _right_titleLable_Width = kScreenWidth * 0.5;
+        _cloumnMaxWidth = frame.size.width * 0.5;
         self.labelWidthArray = @[].mutableCopy;
         self.labelArray = [NSMutableArray array];
         self.leftName = titleArray.firstObject;
@@ -56,9 +69,8 @@ static const CGFloat titleLable_Height = 49;
 - (void)show {
 
     // 检查标题数据
-    if (self.titleArr.count < 2) {
-        NSLog(@"标题个数小于2个");
-        return;
+    if (_titleArr.count < 2) {
+        NSAssert(_titleArr.count < 2, @"标题个数不能小于2个");
     }
     
     // 检查数据是否和标题匹配
@@ -71,62 +83,80 @@ static const CGFloat titleLable_Height = 49;
     
     
     // 处理数据
-    _maxWidth = 0;
     _rightViewWidth = 0;
     UIFont *font = [UIFont systemFontOfSize:15];
     NSMutableArray *columnWidthArray = [NSMutableArray array];
     for (NSInteger i = 0; i < _titleArr.count; i++) {
         [columnWidthArray removeAllObjects];
-        CGFloat columnMaxWidth = 0;
-        CGFloat titleTempWidth = [self getLabelWidthWithTitle:_titleArr[i] font:font];
+        CGFloat tempColumnMaxWidth = 0;
+        CGFloat titleTempWidth = [self labelWidthWithTitle:_titleArr[i] font:font];
         [columnWidthArray addObject:[NSNumber numberWithFloat:titleTempWidth]];
         for (NSInteger j = 0; j < _dataList.count; j++) {
             NSString *columnText = _dataList[j][i];
-            CGFloat columnTempWidth = [self getLabelWidthWithTitle:columnText font:font];
+            NSInteger columnTempWidth = [self labelWidthWithTitle:columnText font:font];
             [columnWidthArray addObject:[NSNumber numberWithFloat:columnTempWidth]];
-            NSLog(@"%@, %zd列 %@, 宽度 %f",_titleArr[i], i,columnText,columnTempWidth);
+            NSLog(@"%@, %zd列 %@, 宽度 %zd",_titleArr[i], i,columnText,columnTempWidth);
         }
         
-        columnMaxWidth = [[columnWidthArray valueForKeyPath:@"@max.floatValue"] floatValue] + 30;
-        [self.labelWidthArray addObject:@(columnMaxWidth)];
         
-        NSLog(@"%zd 列中最大值是%f", i, columnMaxWidth);
+        tempColumnMaxWidth = [[columnWidthArray valueForKeyPath:@"@max.floatValue"] floatValue] + 30;
+        
+        // 是否大于列宽最大值
+        if (tempColumnMaxWidth > _cloumnMaxWidth) {
+            [self.labelWidthArray addObject:@(_cloumnMaxWidth)];
+        } else {
+            [self.labelWidthArray addObject:@(tempColumnMaxWidth)];
+        }
+        
+        
+        
+        NSLog(@"%zd 列中最大值是%f", i, _cloumnMaxWidth);
     }
     
     CGFloat contentViwe_X = [self.labelWidthArray[0] floatValue];
     _rightViewWidth = [[self.labelWidthArray valueForKeyPath:@"@sum.floatValue"] floatValue] - contentViwe_X;
     
     _titleLabel.frame = CGRectMake(0, 0, contentViwe_X, titleLable_Height);
-//    _titleLabel.backgroundColor = [UIColor purpleColor];
     _titleTableView.frame = CGRectMake(0, titleLable_Height, contentViwe_X, self.bounds.size.height - _titleLabel.bounds.size.height);
+    
+    
     
     _contentView.frame = CGRectMake(contentViwe_X, 0, kScreenWidth - contentViwe_X, self.bounds.size.height);
     _contentView.contentSize = CGSizeMake(_rightViewWidth, 0);
 
-//    _contentView.backgroundColor = [UIColor blueColor];
     
     _contentTableView.frame = CGRectMake(0, _titleLabel.bounds.size.height, _rightViewWidth, self.bounds.size.height - _titleLabel.bounds.size.height);
     
     [self setupLabels];
     
+//    if (!_topBackgroundColor) {
+//        _titleLabel.backgroundColor = _topBackgroundColor;
+//    } else {
+//        _titleLabel.backgroundColor = [UIColor lightTextColor];
+//    }
+    
+    _titleLabel.backgroundColor = _topBackgroundColor;
+    
     [self reloadView];
 }
 
 
+- (void)extracted {
+    [self setupTitleTableView];
+}
+
 - (void)setupViews {
     _titleLabel = [[UILabel alloc] init];
-//    _titleLabel.frame = CGRectMake(0, 0, titleLable_Width, titleLable_Height);
     _titleLabel.textColor = [UIColor darkTextColor];
     _titleLabel.textAlignment = NSTextAlignmentCenter;
     _titleLabel.text = self.leftName;
     _titleLabel.font = [UIFont systemFontOfSize:15];
-
     
     [self addSubview:_titleLabel];
     
     [self setupContentView];
     [self setupContentTableView];
-    [self setupTitleTableView];
+    [self extracted];
     
 }
 
@@ -144,14 +174,17 @@ static const CGFloat titleLable_Height = 49;
     NSArray *array = self.dataList[indexPath.row];
     if (tableView == _titleTableView) {
         UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"nameCell"];
-        cell.backgroundColor = [UIColor redColor];
+        cell.backgroundColor = [UIColor colorWithRed:arc4random() % 255 / 256.0 green:arc4random() % 255  / 256.0 blue:arc4random() % 255  / 256.0 alpha:1.0];
         cell.textLabel.text = array.firstObject;
         cell.textLabel.font = [UIFont systemFontOfSize:15];
         return cell;
     } else {
-        UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"infoCell"];
+        
+        PPTableContentCell *cell = [tableView dequeueReusableCellWithIdentifier:contentInfoCell_identifier];
         cell.backgroundColor = [UIColor greenColor];
-        cell.textLabel.text = array.lastObject;
+        cell.labelWidth = self.labelWidthArray.copy;
+        cell.datas = array;
+        
         return cell;
     }
 }
@@ -169,7 +202,6 @@ static const CGFloat titleLable_Height = 49;
 
 - (void)setupContentView {
     _contentView = [[UIScrollView alloc] init];
-//    _contentView.frame = CGRectMake(titleLable_Width, 0, kScreenWidth - titleLable_Width, self.bounds.size.height);
     _contentView.delegate = self;
     _contentView.bounces = NO;
     _contentView.showsHorizontalScrollIndicator = NO;
@@ -177,21 +209,6 @@ static const CGFloat titleLable_Height = 49;
     
     
     [self addSubview:self.contentView];
-    
-//    // 记录上一次控件的位置
-//    NSInteger x = 0;
-//    for (NSInteger i = 0; i < _titleArr.count; i++) {
-//        NSString *title = self.titleArr[i];
-//        UILabel *label = [[UILabel alloc] init];
-//        label.frame = CGRectMake(i * _right_titleLable_Width, 0, _right_titleLable_Width, titleLable_Height);
-//        label.text = title;
-//        label.font = [UIFont systemFontOfSize:15];
-//        label.textColor = [UIColor redColor];
-//        label.textAlignment = NSTextAlignmentLeft;
-//        [self.contentView addSubview:label];
-//        [self.labelArray addObject:label];
-//        x += label.frame.size.width;
-//    }
 }
 
 
@@ -202,6 +219,13 @@ static const CGFloat titleLable_Height = 49;
         NSString *title = self.titleArr[i];
         CGFloat width = [self.labelWidthArray[i] floatValue];
         UILabel *label = [[UILabel alloc] init];
+        if (!_topBackgroundColor) {
+            label.backgroundColor = _topBackgroundColor;
+        } else {
+            label.backgroundColor = [UIColor lightTextColor];
+        }
+        
+        label.backgroundColor = [UIColor colorWithRed:arc4random() % 255 / 256.0 green:arc4random() % 255  / 256.0 blue:arc4random() % 255  / 256.0 alpha:1.0];
         label.frame = CGRectMake(x, 0, width, titleLable_Height);
         label.text = title;
         label.font = [UIFont systemFontOfSize:15];
@@ -214,7 +238,6 @@ static const CGFloat titleLable_Height = 49;
 }
 
 - (void)setupTitleTableView {
-//    CGRect frame = CGRectMake(0, _titleLabel.bounds.size.height, titleLable_Width, self.bounds.size.height - _titleLabel.bounds.size.height);
     _titleTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     _titleTableView.delegate = self;
     _titleTableView.dataSource = self;
@@ -229,7 +252,6 @@ static const CGFloat titleLable_Height = 49;
 
 
 - (void)setupContentTableView {
-//    CGRect frame = CGRectMake(0, _titleLabel.bounds.size.height, _titleArr.count * _right_titleLable_Width, self.bounds.size.height - _titleLabel.bounds.size.height);
     _contentTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     _contentTableView.delegate = self;
     _contentTableView.dataSource = self;
@@ -238,12 +260,12 @@ static const CGFloat titleLable_Height = 49;
     _contentTableView.showsHorizontalScrollIndicator = NO;
     _contentTableView.bounces = NO;
     _contentTableView.tableFooterView = [[UIView alloc] init];
-
+    [_contentTableView registerClass:[PPTableContentCell class] forCellReuseIdentifier:contentInfoCell_identifier];
     [self.contentView addSubview:self.contentTableView];
 }
 
 
-- (CGFloat)getLabelWidthWithTitle:(NSString *)title font:(UIFont *)font {
+- (CGFloat)labelWidthWithTitle:(NSString *)title font:(UIFont *)font {
     UILabel *lable = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 2000, font.lineHeight)];
     lable.text = title;
     lable.font = font;

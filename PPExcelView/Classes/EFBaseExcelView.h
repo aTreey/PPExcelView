@@ -18,21 +18,15 @@
 
 @interface EFBaseExcelView : UIView <UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource>
 
-@property (nonatomic, strong) UITableView *titleTableView;//标题TableView
-@property (nonatomic, strong) UITableView *contentTableView;//内容TableView
-@property (nonatomic, strong) UIScrollView *contentView;//内容容器
-@property (nonatomic, assign) CGSize contentSize;
-@property (nonatomic, assign) CGFloat cellHeight;
-@property (nonatomic, assign) CGFloat leftViewWidth;
-@property (nonatomic, assign) CGFloat rightViewWidth;
 
+// 头部标题背景颜色
+@property (nonatomic, strong) UIColor *topBackgroundColor;
 @property (nonatomic, strong) NSArray *titleArr; // 标题数组
 @property (nonatomic, copy) NSString *leftName; // 左边表头名字
 @property (nonatomic, assign) NSTextAlignment aligment; // 标题对齐方式
 
 @property (nonatomic, strong) NSMutableArray *dataList;
 
-- (void)reloadView;
 
 - (void)show;
 

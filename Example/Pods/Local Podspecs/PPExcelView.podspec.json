@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "summary": "A ExcelView.",
   "description": "类似表格的控件，自适应列宽",
-  "homepage": "https://github.com/aTreey/PPExcelView",
+  "homepage": "https://github.com/aTreey/PPExcelView.git",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -18,7 +18,7 @@
   "platforms": {
     "ios": "8.0"
   },
-  "source_files": "PPExcelView/Classes/**/*.{h,m}",
+  "source_files": "PPExcelView/Classes/**/*",
   "dependencies": {
     "Masonry": [
 
