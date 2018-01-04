@@ -18,12 +18,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSArray *titleArray = @[@"资产类别名称", @"品名", @"账面数量", @"实际数量", @"差额的字数比较多长度也比较长"];
+    NSArray *titleArray = @[@"资产类别名称", @"各个资产的品名灯光叫啊叫几个", @"账面数量", @"实际数量", @"差额的字数比较多长度也比较长"];
     NSMutableArray *dataList = @[
                                   @[@"车辆-类别", @"电脑显示器", @"100", @"20", @"500"],
                                   @[@"台式电脑显", @"笔记本", @"100", @"20", @"500"],
-                                  @[@"类类", @"台式电脑宏基显示器", @"100", @"20", @"500"],
-                                  @[@"我是", @"台式电脑宏基显示器", @"100", @"20", @"500"],
+                                  @[@"类类", @"台式", @"100", @"20", @"500"],
+                                  @[@"我是", @"台式电脑宏基", @"100", @"20", @"500"],
                           ].mutableCopy;
     EFBaseExcelView *excelView = [[EFBaseExcelView alloc] initWithFrame:CGRectMake(0, 64, kScreenWidth, kScreenHeight - 64) titleArray:titleArray];
     excelView.dataList = dataList;

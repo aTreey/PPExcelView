@@ -13,7 +13,6 @@
 
 static const CGFloat titleLable_Height = 49;
 
-static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifier";
 
 
 @interface EFBaseExcelView ()
@@ -25,7 +24,6 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
 @property (nonatomic, strong) NSMutableArray *labelArray;
 @property (nonatomic, strong) NSMutableArray *labelWidthArray;
 @property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, assign) CGFloat right_titleLable_Width;
 
 // 右边tableView 宽度
 @property (nonatomic, assign) CGFloat rightViewWidth;
@@ -38,14 +36,14 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
 
 @implementation EFBaseExcelView
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        _cloumnMaxWidth = frame.size.width * 0.5;
-        [self setupViews];
-    }
-    return self;
-}
+//- (instancetype)initWithFrame:(CGRect)frame {
+//    self = [super initWithFrame:frame];
+//    if (self) {
+//        _cloumnMaxWidth = frame.size.width * 0.5;
+//        [self setupViews];
+//    }
+//    return self;
+//}
 
 - (instancetype)initWithFrame:(CGRect)frame titleArray:(NSArray *)titleArray {
     self = [super initWithFrame:frame];
@@ -180,10 +178,13 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
         return cell;
     } else {
         
-        PPTableContentCell *cell = [tableView dequeueReusableCellWithIdentifier:contentInfoCell_identifier];
-        cell.backgroundColor = [UIColor greenColor];
-        cell.labelWidth = self.labelWidthArray.copy;
-        cell.datas = array;
+        
+//        PPTableContentCell *cell = [tableView dequeueReusableCellWithIdentifier:contentInfoCell_identifier];
+//        cell.backgroundColor = [UIColor greenColor];
+//        cell.labelWidth = self.labelWidthArray.copy;
+//        cell.datas = array;
+        
+        PPTableContentCell *cell = [PPTableContentCell contentCellWithTableView:tableView labelsWidth:self.labelWidthArray.copy datas:array];
         
         return cell;
     }
@@ -195,7 +196,12 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
         [_contentTableView setContentOffset:CGPointMake(_contentTableView.contentOffset.x, _titleTableView.contentOffset.y)];
     }
     if (scrollView == _contentTableView) {
+        NSLog(@"_contentTableView = %@", _contentTableView.contentOffset);
         [_titleTableView setContentOffset:CGPointMake(0, _contentTableView.contentOffset.y)];
+    }
+    
+    if (scrollView == _contentView) {
+        NSLog(@"_contentView");
     }
 }
 
@@ -203,10 +209,10 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
 - (void)setupContentView {
     _contentView = [[UIScrollView alloc] init];
     _contentView.delegate = self;
-    _contentView.bounces = NO;
-    _contentView.showsHorizontalScrollIndicator = NO;
-    _contentView.showsVerticalScrollIndicator = NO;
-    
+//    _contentView.bounces = NO;
+//    _contentView.showsHorizontalScrollIndicator = NO;
+//    _contentView.showsVerticalScrollIndicator = NO;
+//
     
     [self addSubview:self.contentView];
 }
@@ -242,9 +248,9 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
     _titleTableView.delegate = self;
     _titleTableView.dataSource = self;
     _titleTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _titleTableView.showsVerticalScrollIndicator = NO;
-    _titleTableView.showsHorizontalScrollIndicator = NO;
-    _titleTableView.bounces = NO;
+//    _titleTableView.showsVerticalScrollIndicator = NO;
+//    _titleTableView.showsHorizontalScrollIndicator = NO;
+//    _titleTableView.bounces = NO;
     _titleTableView.tableFooterView = [[UIView alloc] init];
     [self addSubview:self.titleTableView];
 }
@@ -256,11 +262,11 @@ static NSString * const contentInfoCell_identifier = @"contentInfoCell_identifie
     _contentTableView.delegate = self;
     _contentTableView.dataSource = self;
     _contentTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _contentTableView.showsVerticalScrollIndicator = NO;
-    _contentTableView.showsHorizontalScrollIndicator = NO;
-    _contentTableView.bounces = NO;
+//    _contentTableView.showsVerticalScrollIndicator = NO;
+//    _contentTableView.showsHorizontalScrollIndicator = NO;
+//    _contentTableView.bounces = NO;
     _contentTableView.tableFooterView = [[UIView alloc] init];
-    [_contentTableView registerClass:[PPTableContentCell class] forCellReuseIdentifier:contentInfoCell_identifier];
+//    [_contentTableView registerClass:[PPTableContentCell class] forCellReuseIdentifier:contentInfoCell_identifier];
     [self.contentView addSubview:self.contentTableView];
 }
 

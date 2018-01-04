@@ -10,5 +10,5 @@
 @interface PPTableContentCell : UITableViewCell
 @property (nonatomic, strong) NSArray *labelWidth;
 @property (nonatomic, strong) NSArray *datas;
-
++ (instancetype)contentCellWithTableView:(UITableView *)tableView labelsWidth:(NSArray *)widths datas:(NSArray *)datas;
 @end
