@@ -30,5 +30,5 @@ PPExcelView is available under the MIT license. See the LICENSE file for more in
 
 ## reference
 
-[![](https://github.com/RmondJone/ExcelView)](https://github.com/RmondJone/ExcelView)
-ExcelView
+![ExcelView](https://github.com/RmondJone/ExcelView)
+
